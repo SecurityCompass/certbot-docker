@@ -7,7 +7,7 @@ print_usage() {
 cat << EOF
 usage: ${0} options
 
-This script helps to update content views in Foreman.
+This script wraps certbot to help manage certificates.
 
 OPTIONS:
     Parameters:
@@ -111,10 +111,10 @@ function renew_certificate {
     local certbot_args="${4:-}"
 
     if [ "$STAGING" = true ]; then
-        certbot_args=$certbot_args" --staging"
+        certbot_args="${certbot_args} --staging"
     fi
     if [ "$DEBUG" = true ]; then
-        certbot_args=$certbot_args" --debug"
+        certbot_args="${certbot_args} --debug"
     fi
 
     echo "Renewing certificates registered on system."
