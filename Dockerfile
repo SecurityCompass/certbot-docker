@@ -11,5 +11,7 @@ VOLUME /certs
 VOLUME /challenges
 
 COPY ./bin/ /usr/local/bin/
+RUN chmod +x /usr/local/bin/run_certbot.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
