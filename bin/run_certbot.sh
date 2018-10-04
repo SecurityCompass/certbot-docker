@@ -7,7 +7,7 @@ print_usage() {
 cat << EOF
 usage: ${0} options
 
-This script wraps certbot to help manage certificates.
+This script wraps certbot to obtain and renew certificates.
 
 OPTIONS:
     Parameters:
@@ -22,23 +22,6 @@ Version: ${VERSION}
 EOF
 }
 
-function is_domain {
-    # Takes domain/IP as parameter.
-    # Returns 0 if value is not an IP address.
-    if [ -z "${1}" ] ; then
-        echo "Missing parameter 1: Domain name"
-        return 1
-    fi
-
-    local cert_domain="${1}"
-
-    if [[ "${cert_domain}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        return 1
-    else
-        return 0
-    fi
-}
-
 function check_for_cert {
     # Check if certificate directory exists
     if [ -z "${1}" ] ; then
@@ -49,13 +32,7 @@ function check_for_cert {
     local cert_domain="${1}"
     local cert_dir="/etc/letsencrypt/live/${cert_domain}"
 
-    if [ -d "${cert_dir}" ] ; then
-        echo "Found ${cert_dir}."
-        return 0
-    else
-        echo "${cert_dir} not found."
-        return 1
-    fi
+    [ -d "${cert_dir}" ] && return 0 || return 1
 }
 
 function copy_certificates {
@@ -145,18 +122,13 @@ function process_certificates {
     local cert_webroot="${3}"
     local certbot_args="${4:-}"
 
-    if is_domain "${cert_domain}" ; then
-        if check_for_cert "${cert_domain}" ; then
-            renew_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}" "${certbot_args}"
-        else
-            obtain_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}" "${certbot_args}"
-        fi
-
-        copy_certificates "${cert_domain}"
+    if check_for_cert "${cert_domain}"; then
+        renew_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}" "${certbot_args}"
     else
-        echo "Hostname appears to be IP address, not obtaining certificates."
-        exit 1
+        obtain_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}" "${certbot_args}"
     fi
+
+    copy_certificates "${cert_domain}"
 }
 
 admin_email="${admin_email:-}"
