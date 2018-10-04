@@ -7,9 +7,6 @@ RUN apk update && \
     apk add openssl curl && \
     rm -rf /var/cache/apk/*
 
-VOLUME /certs
-VOLUME /challenges
-
 COPY ./bin/ /usr/local/bin/
 RUN chmod +x /usr/local/bin/run_certbot.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
