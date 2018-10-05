@@ -14,9 +14,6 @@ OPTIONS:
     -d Domain for certificate.
     -e Administrator email used when obtaining certificates.
     -r Webroot location to place challenge auth files.
-    -A Additional arguments to pass to certbot command.
-    -D Enable debug mode for additional output.
-    -S Enable staging mode for test certificates.
 
 Version: ${VERSION}
 EOF
@@ -84,16 +81,6 @@ function obtain_certificate {
 }
 
 function renew_certificate {
-    # Renew certificate for provided domain
-    local certbot_args="${4:-}"
-
-    if [ "$STAGING" = true ]; then
-        certbot_args="${certbot_args} --staging"
-    fi
-    if [ "$DEBUG" = true ]; then
-        certbot_args="${certbot_args} --debug"
-    fi
-
     echo "Renewing certificates registered on system."
     certbot renew \
         --webroot -w "${cert_webroot}" \
@@ -120,12 +107,11 @@ function process_certificates {
     local admin_email="${1}"
     local cert_domain="${2}"
     local cert_webroot="${3}"
-    local certbot_args="${4:-}"
 
     if check_for_cert "${cert_domain}"; then
-        renew_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}" "${certbot_args}"
+        renew_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}"
     else
-        obtain_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}" "${certbot_args}"
+        obtain_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}"
     fi
 
     copy_certificates "${cert_domain}"
@@ -134,16 +120,11 @@ function process_certificates {
 admin_email="${admin_email:-}"
 certificate_domain="${certificate_domain:-}"
 certificate_webroot="${certificate_webroot:-}"
-staging="${staging:-}"
-certbot_args="${certbot_args:-}"
 while getopts ":d:e:r:A:SD" opt; do
     case ${opt} in
         'd') certificate_domain="${OPTARG}" ;;
         'r') certificate_webroot="${OPTARG}" ;;
         'e') admin_email="${OPTARG}" ;;
-        'A') certbot_args="${OPTARG}" ;;
-        'S') STAGING=true ;;
-        'D') DEBUG=true ;;
         '?')
             echo "Invalid option: -${OPTARG}"
             print_usage
@@ -162,4 +143,4 @@ while getopts ":d:e:r:A:SD" opt; do
     esac
 done
 
-process_certificates "${admin_email}" "${certificate_domain}" "${certificate_webroot}" "${certbot_args}"
+process_certificates "${admin_email}" "${certificate_domain}" "${certificate_webroot}"
