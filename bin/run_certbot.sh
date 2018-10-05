@@ -20,28 +20,26 @@ EOF
 }
 
 function check_for_cert {
-    # Check if certificate directory exists
     if [ -z "${1}" ] ; then
         echo "Missing parameter 1: Domain name"
         return 1
     fi
-
     local cert_domain="${1}"
+
     local cert_dir="/etc/letsencrypt/live/${cert_domain}"
 
+    echo "Check if certificate directory exists"
     [ -d "${cert_dir}" ] && return 0 || return 1
 }
 
 function copy_certificates {
-    # Copy certificate files to /certs/ docker volume
-    # Check if certificate directory exists
     if [ -z "${1}" ] ; then
         echo "Missing parameter 1: Domain name"
         return 1
     fi
-
     local cert_domain="${1}"
 
+    echo "Copy certificate files to /certs/ docker volume"
     cp -v /etc/letsencrypt/live/"${cert_domain}"/cert.pem /certs/"${cert_domain}".pem
     cp -v /etc/letsencrypt/live/"${cert_domain}"/privkey.pem /certs/"${cert_domain}".key.pem
     cp -v /etc/letsencrypt/live/"${cert_domain}"/chain.pem /certs/"${cert_domain}".chain.pem
@@ -54,33 +52,39 @@ function obtain_certificate {
         echo "Missing parameter 1: Admin email"
         return 1
     fi
+    local admin_email="${1}"
+
     if [ -z "${2}" ] ; then
         echo "Missing parameter 2: Certificate domain name"
         return 1
     fi
+    local cert_domain="${2}"
+
     if [ -z "${3}" ] ; then
         echo "Missing parameter 3: Webroot location"
         return 1
     fi
+    local cert_webroot="${3}"
 
-    local admin_email="${1}"
-    local certificate_domain="${2}"
-    local certificate_webroot="${3}"
-
-    echo "Obtaining certificate for ${certificate_domain}"
-
+    echo "Obtaining certificate for ${cert_domain}"
     certbot certonly \
-        --webroot -w "${certificate_webroot}" \
+        --webroot -w "${cert_webroot}" \
         --keep-until-expiring \
         --agree-tos \
         --renew-by-default \
         --non-interactive \
         --max-log-backups 100 \
         --email "${admin_email}" \
-        --domain "${certificate_domain}"
+        --domain "${cert_domain}"
 }
 
 function renew_certificate {
+    if [ -z "${1}" ] ; then
+        echo "Missing parameter 1: Webroot location"
+        return 1
+    fi
+    local cert_webroot="${1}"
+
     echo "Renewing certificates registered on system."
     certbot renew \
         --webroot -w "${cert_webroot}" \
@@ -89,27 +93,26 @@ function renew_certificate {
 }
 
 function process_certificates {
-    # Check certificate for expiry, renew if required and move to correct location.
     if [ -z "${1}" ] ; then
-        echo "Missing parameter 1: Admin email"
+        echo "Missing required parameter 1: Admin email"
         return 1
     fi
+    local admin_email="${1}"
 
     if [ -z "${2}" ] ; then
-        echo "Missing parameter 2: Certificate domain name"
+        echo "Missing required parameter 2: Certificate domain name"
         return 1
     fi
-    if [ -z "${3}" ] ; then
-        echo "Missing parameter 3: Webroot location"
-        return 1
-    fi
-
-    local admin_email="${1}"
     local cert_domain="${2}"
+
+    if [ -z "${3}" ] ; then
+        echo "Missing required parameter 3: Webroot location"
+        return 1
+    fi
     local cert_webroot="${3}"
 
     if check_for_cert "${cert_domain}"; then
-        renew_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}"
+        renew_certificate "${cert_webroot}"
     else
         obtain_certificate "${admin_email}" "${cert_domain}" "${cert_webroot}"
     fi
