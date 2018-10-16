@@ -68,14 +68,14 @@ function obtain_certificate {
 
     echo "Obtaining certificate for ${cert_domain}"
     certbot certonly \
-        --webroot -w "${cert_webroot}" \
-        --keep-until-expiring \
         --agree-tos \
-        --renew-by-default \
-        --non-interactive \
-        --max-log-backups 100 \
+        --domain "${cert_domain}" \
         --email "${admin_email}" \
-        --domain "${cert_domain}"
+        --keep-until-expiring \
+        --max-log-backups 100 \
+        --non-interactive \
+        --renew-by-default \
+        --webroot -w "${cert_webroot}"
 }
 
 function renew_certificate {
@@ -87,8 +87,8 @@ function renew_certificate {
 
     echo "Renewing certificates registered on system."
     certbot renew \
-        --webroot -w "${cert_webroot}" \
-        --non-interactive
+        --non-interactive \
+        --webroot -w "${cert_webroot}"
 }
 
 function process_certificates {
@@ -125,8 +125,8 @@ certificate_webroot="${certificate_webroot:-}"
 while getopts ":d:e:r:A:SD" opt; do
     case ${opt} in
         'd') certificate_domain="${OPTARG}" ;;
-        'r') certificate_webroot="${OPTARG}" ;;
         'e') admin_email="${OPTARG}" ;;
+        'r') certificate_webroot="${OPTARG}" ;;
         '?')
             echo "Invalid option: -${OPTARG}"
             print_usage
