@@ -88,8 +88,7 @@ function renew_certificate {
     echo "Renewing certificates registered on system."
     certbot renew \
         --webroot -w "${cert_webroot}" \
-        --non-interactive \
-        --deploy-hook copy_certificates.sh
+        --non-interactive
 }
 
 function process_certificates {
