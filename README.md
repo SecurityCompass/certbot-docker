@@ -1,6 +1,8 @@
 # certbot-docker
 
-A container that runs `certbot` to help manage certificates. Docker volumes are used to share certificates and other files (e.g. challenges) across containers. This means multiple web server containers can take advantage of a single `certbot` container.  
+A container that runs `certbot` to help manage certificates. 
+
+Docker volumes are used to share certificates and other files (e.g. challenges) across containers. This means multiple web server containers can take advantage of a single `certbot` container.  
 
 ### Sample usage
 In your `docker-compose.yaml` file:
