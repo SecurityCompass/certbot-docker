@@ -35,8 +35,6 @@ jobs:
     script:
       - bash bin/travis-ci/docker_upgrade.sh
       - bash bin/travis-ci/docker_build.sh
-    before_deploy:
-      - bash bin/travis-ci/check_tag.sh
     deploy:
       skip_cleanup: true
       provider: script
