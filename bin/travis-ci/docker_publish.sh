@@ -20,5 +20,9 @@ set -eo pipefail
 # Log into our Docker registry
 echo "${DOCKER_REGISTRY_PASSWORD}" | docker login -u "${DOCKER_REGISTRY_USER}" --password-stdin "${DOCKER_REGISTRY_URL}"
 
-# Push image
-docker push "${DOCKER_REGISTRY_URL}/postfix:latest"
+echo "Tagging container"
+docker tag "${DOCKER_REGISTRY_URL}/certbot:latest" "${DOCKER_REGISTRY_URL}/certbot:${TRAVIS_TAG}"
+
+# Push images
+docker push "${DOCKER_REGISTRY_URL}/certbot:latest"
+docker push "${DOCKER_REGISTRY_URL}/certbot:${TRAVIS_TAG}"
