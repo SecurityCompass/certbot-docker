@@ -18,5 +18,5 @@
 set -eo pipefail
 
 # Build image
-docker build --no-cache --tag "${DOCKER_REGISTRY_URL}/postfix" .
+docker build --no-cache --tag "${DOCKER_REGISTRY_URL}/certbot" .
 docker images
