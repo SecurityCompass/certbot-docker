@@ -26,3 +26,4 @@ docker tag "${DOCKER_REGISTRY_URL}/certbot:latest" "${DOCKER_REGISTRY_URL}/certb
 # Push images
 docker push "${DOCKER_REGISTRY_URL}/certbot:latest"
 docker push "${DOCKER_REGISTRY_URL}/certbot:${TRAVIS_TAG}"
+docker images
