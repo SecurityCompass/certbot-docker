@@ -1,4 +1,4 @@
-
+# Define build stages
 stages:
   - Tests
   - SDLC Tasks
@@ -35,4 +35,11 @@ jobs:
     script:
       - bash bin/travis-ci/docker_upgrade.sh
       - bash bin/travis-ci/docker_build.sh
-      - if [[ ${TRAVIS_BRANCH} = "master" ]]; then bash bin/travis-ci/docker_publish.sh; fi
+    before_deploy:
+      - bash bin/travis-ci/check_tag.sh
+    deploy:
+      skip_cleanup: true
+      provider: script
+      script: bash bin/travis-ci/docker_publish.sh
+      on:
+        tags: true
