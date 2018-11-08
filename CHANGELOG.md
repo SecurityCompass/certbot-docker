@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Deployment step in CI
 - Initial commit of Docker, CI build, and configuration
 - Move `certbot` directory from `moodle-docker` to this repo
+- CONTRIBUTION.md
 
 ### Changed
 - Clean up CI configuration
